@@ -1,42 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Salesforce Canvas - Google API Test</title>
+  <title>Google API in Salesforce Canvas</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Salesforce Canvas SDK -->
-  <script src="https://na1.salesforce.com/canvas/sdk/js/36.0/canvas-all.js"></script>
+  <script src="/canvas/sdk/js/56.0/canvas-all.js"></script> <!-- latest API version -->
 </head>
 <body>
-  <h2>Salesforce Canvas - Google API Test</h2>
+  <h2>Google API Test</h2>
   <div id="output">Loading...</div>
-
   <script>
-    Sfdc.canvas(function() {
-      Sfdc.canvas.oauth.init();
-
-      // Fetch Salesforce signed request
-      Sfdc.canvas.client.refreshSignedRequest(function(data) {
-        if (data && data.client) {
-          $("#output").html("<p>Connected to Salesforce as: " + data.context.user.fullName + "</p>");
-        } else {
-          $("#output").html("<p>Failed to load signed request.</p>");
-        }
-      });
-    });
-
-    // Example: Call Google API using token (replace with Apex-provided token if needed)
-    function callGoogleAPI(accessToken) {
+    function fetchGoogleData(endpoint) {
       $.ajax({
-        url: "https://www.googleapis.com/oauth2/v2/userinfo",
-        headers: { "Authorization": "Bearer " + accessToken },
+        url: '/services/apexrest/GoogleAPI/' + endpoint,
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + Sfdc.canvas.oauth.token },
         success: function(res) {
-          $("#output").append("<p>Hello, " + res.email + "</p>");
+          $("#output").append("<pre>" + JSON.stringify(res, null, 2) + "</pre>");
         },
         error: function(err) {
           $("#output").append("<p>Error: " + JSON.stringify(err) + "</p>");
         }
       });
     }
+    // Example call
+    fetchGoogleData('userinfo');
   </script>
 </body>
 </html>
