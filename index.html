@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Salesforce Canvas - Google API Test</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- Salesforce Canvas SDK -->
+  <script src="https://na1.salesforce.com/canvas/sdk/js/36.0/canvas-all.js"></script>
+</head>
+<body>
+  <h2>Salesforce Canvas - Google API Test</h2>
+  <div id="output">Loading...</div>
+
+  <script>
+    Sfdc.canvas(function() {
+      Sfdc.canvas.oauth.init();
+
+      // Fetch Salesforce signed request
+      Sfdc.canvas.client.refreshSignedRequest(function(data) {
+        if (data && data.client) {
+          $("#output").html("<p>Connected to Salesforce as: " + data.context.user.fullName + "</p>");
+        } else {
+          $("#output").html("<p>Failed to load signed request.</p>");
+        }
+      });
+    });
+
+    // Example: Call Google API using token (replace with Apex-provided token if needed)
+    function callGoogleAPI(accessToken) {
+      $.ajax({
+        url: "https://www.googleapis.com/oauth2/v2/userinfo",
+        headers: { "Authorization": "Bearer " + accessToken },
+        success: function(res) {
+          $("#output").append("<p>Hello, " + res.email + "</p>");
+        },
+        error: function(err) {
+          $("#output").append("<p>Error: " + JSON.stringify(err) + "</p>");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
