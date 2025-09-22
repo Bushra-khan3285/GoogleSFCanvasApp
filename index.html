@@ -1,31 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Google API in Salesforce Canvas</title>
+  <title>Salesforce Canvas - Google API Test</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="/canvas/sdk/js/56.0/canvas-all.js"></script> <!-- latest API version -->
+  <!-- Always load Canvas SDK relative to Salesforce org -->
   <script src="/canvas/sdk/js/36.0/canvas-all.js"></script>
 </head>
 <body>
-  <h2>Google API Test</h2>
+  <h2>Salesforce Canvas - Google API Test1.0</h2>
   <div id="output">Loading...</div>
+
   <script>
-    function fetchGoogleData(endpoint) {
+    // Called when Canvas is ready
+    Sfdc.canvas(function () {
+      console.log("Canvas initialized...");
+      Sfdc.canvas.oauth.init();
+
+      // Fetch signed request from Salesforce
+      Sfdc.canvas.client.refreshSignedRequest(function (data) {
+        console.log("Signed Request Data:", data);
+
+        if (data && data.context && data.context.user) {
+          $("#output").html("<p>Connected to Salesforce as: <b>" +
+            data.context.user.fullName + "</b></p>");
+        } else {
+          $("#output").html("<p>❌ Failed to load signed request.</p>");
+          return;
+        }
+
+        // Call Apex REST wrapper to fetch Google User Info
+        fetchGoogleUser();
+      });
+    });
+
+    // Call Apex REST Wrapper (GoogleAPIService class)
+    function fetchGoogleUser() {
       $.ajax({
-        url: '/services/apexrest/GoogleAPI/' + endpoint,
-        method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + Sfdc.canvas.oauth.token },
-        success: function(res) {
-          $("#output").append("<pre>" + JSON.stringify(res, null, 2) + "</pre>");
+        url: "/services/apexrest/GoogleAPI/userinfo",
+        method: "GET",
+        success: function (res) {
+          console.log("Google API Response:", res);
+          $("#output").append("<p>✅ Google User Info: " + JSON.stringify(res) + "</p>");
         },
-        error: function(err) {
-          $("#output").append("<p>Error: " + JSON.stringify(err) + "</p>");
+        error: function (err) {
+          console.error("Google API Error:", err);
+          $("#output").append("<p>❌ Google API Error: " + JSON.stringify(err) + "</p>");
         }
       });
     }
-    // Example call
-    fetchGoogleData('userinfo');
   </script>
 </body>
 </html>
-
