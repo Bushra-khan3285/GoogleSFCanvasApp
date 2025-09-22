@@ -7,7 +7,7 @@
   <script src="/canvas/sdk/js/36.0/canvas-all.js"></script>
 </head>
 <body>
-  <h2>Salesforce Canvas - Google API Test1.0</h2>
+  <h2>Salesforce Canvas - Google API Test 1.0</h2>
   <div id="output">Loading...</div>
 
   <script>
@@ -20,7 +20,12 @@
       Sfdc.canvas.client.refreshSignedRequest(function (data) {
         console.log("Signed Request Data:", data);
 
-        if (data && data.context && data.context.user) {
+        if (!data) {
+          $("#output").html("<p>❌ No signed request received. Check Canvas App Settings.</p>");
+          return;
+        }
+
+        if (data.context && data.context.user) {
           $("#output").html("<p>Connected to Salesforce as: <b>" +
             data.context.user.fullName + "</b></p>");
         } else {
@@ -28,7 +33,7 @@
           return;
         }
 
-        // Call Apex REST wrapper to fetch Google User Info
+        // If signed request worked → call Apex REST wrapper
         fetchGoogleUser();
       });
     });
@@ -51,4 +56,3 @@
   </script>
 </body>
 </html>
-
